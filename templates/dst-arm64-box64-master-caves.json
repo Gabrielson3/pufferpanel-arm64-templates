@@ -1,0 +1,162 @@
+{
+  "type": "dst-arm64-master-caves",
+  "display": "Don't Starve Together (ARM64 / Box64 / Master + Caves)",
+  "icon": "dontstarvetogether",
+  "data": {
+    "servername": {
+      "type": "string",
+      "value": "DST Server",
+      "display": "Server name",
+      "desc": "Public game session name",
+      "required": true,
+      "userEdit": true
+    },
+    "description": {
+      "type": "string",
+      "value": "Don't Starve Together server",
+      "display": "Server description",
+      "desc": "Public session description",
+      "required": true,
+      "userEdit": true
+    },
+    "servertoken": {
+      "type": "string",
+      "value": "",
+      "display": "Klei cluster token",
+      "desc": "Private token supplied in PufferPanel. Never commit credentials",
+      "required": true,
+      "userEdit": true
+    },
+    "password": {
+      "type": "string",
+      "value": "",
+      "display": "Server password",
+      "desc": "Optional session password",
+      "required": false,
+      "userEdit": true
+    },
+    "maxplayers": {
+      "type": "integer",
+      "value": 6,
+      "display": "Maximum players",
+      "desc": "Maximum concurrent players",
+      "required": true,
+      "userEdit": true
+    },
+    "gamemode": {
+      "type": "option",
+      "value": "survival",
+      "display": "Game mode",
+      "desc": "Cluster game mode",
+      "required": true,
+      "userEdit": true,
+      "options": [
+        {
+          "value": "survival",
+          "display": "Survival"
+        },
+        {
+          "value": "endless",
+          "display": "Endless"
+        },
+        {
+          "value": "wilderness",
+          "display": "Wilderness"
+        }
+      ]
+    },
+    "masterport": {
+      "type": "integer",
+      "value": 10999,
+      "display": "Master UDP port",
+      "desc": "Must differ from the Caves game port",
+      "required": true,
+      "userEdit": true
+    },
+    "cavesport": {
+      "type": "integer",
+      "value": 11000,
+      "display": "Caves UDP port",
+      "desc": "Must differ from the Master game port",
+      "required": true,
+      "userEdit": true
+    }
+  },
+  "install": [
+    {
+      "type": "steamgamedl",
+      "appId": "343050"
+    },
+    {
+      "type": "mkdir",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/Master"
+    },
+    {
+      "type": "mkdir",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/Caves"
+    },
+    {
+      "type": "writefile",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/cluster_token.txt",
+      "text": "${servertoken}",
+      "if": "!file_exists(\"DoNotStarveTogether/DontStarveTogetherServer/cluster_token.txt\")"
+    },
+    {
+      "type": "writefile",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/cluster.ini",
+      "text": "[GAMEPLAY]\ngame_mode = ${gamemode}\nmax_players = ${maxplayers}\npvp = false\npause_when_empty = true\n\n[NETWORK]\ncluster_name = ${servername}\ncluster_description = ${description}\ncluster_intention = cooperative\ncluster_password = ${password}\n\n[MISC]\nconsole_enabled = true\n\n[SHARD]\nshard_enabled = true\nbind_ip = 127.0.0.1\nmaster_ip = 127.0.0.1\nmaster_port = 10889\ncluster_key = __AUTO_KEY__\n",
+      "if": "!file_exists(\"DoNotStarveTogether/DontStarveTogetherServer/cluster.ini\")"
+    },
+    {
+      "type": "writefile",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/Master/server.ini",
+      "text": "[NETWORK]\nserver_port = ${masterport}\n\n[STEAM]\nmaster_server_port = 27018\nauthentication_port = 8768\n\n[SHARD]\nis_master = true\nname = Master\nid = 1\n",
+      "if": "!file_exists(\"DoNotStarveTogether/DontStarveTogetherServer/Master/server.ini\")"
+    },
+    {
+      "type": "writefile",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/Caves/server.ini",
+      "text": "[NETWORK]\nserver_port = ${cavesport}\n\n[STEAM]\nmaster_server_port = 27019\nauthentication_port = 8769\n\n[SHARD]\nis_master = false\nname = Caves\nid = 2\n",
+      "if": "!file_exists(\"DoNotStarveTogether/DontStarveTogetherServer/Caves/server.ini\")"
+    },
+    {
+      "type": "writefile",
+      "target": "DoNotStarveTogether/DontStarveTogetherServer/Caves/worldgenoverride.lua",
+      "text": "return {\n  override_enabled = true,\n  preset = \"DST_CAVE\",\n}\n",
+      "if": "!file_exists(\"DoNotStarveTogether/DontStarveTogetherServer/Caves/worldgenoverride.lua\")"
+    },
+    {
+      "type": "writefile",
+      "target": "start_dst_master_caves.sh",
+      "text": "#!/usr/bin/env bash\n# Experimental DST Master+Caves supervisor for Linux ARM64/Box64.\nset -Eeuo pipefail\nROOT=$(cd -- \"$(dirname -- \"$0\")\" && pwd -P)\nCLUSTER_DIR=\"$ROOT/DoNotStarveTogether/DontStarveTogetherServer\"\nBIN_DIR=\"$ROOT/bin64\"\nBIN=\"$BIN_DIR/dontstarve_dedicated_server_nullrenderer_x64\"\nBOX64=$(command -v box64 || true)\n\nif [[ -z \"$BOX64\" || ! -x \"$BOX64\" ]]; then echo \"Box64 is not available in PATH\" >&2; exit 127; fi\nif [[ ! -f \"$BIN\" ]]; then echo \"DST x86_64 dedicated server binary was not found\" >&2; exit 127; fi\nif [[ ! -s \"$CLUSTER_DIR/cluster_token.txt\" ]]; then echo \"Missing Klei cluster token\" >&2; exit 2; fi\nif [[ ! -f \"$CLUSTER_DIR/cluster.ini\" ]]; then echo \"Missing cluster.ini\" >&2; exit 2; fi\n\nif grep -q '^cluster_key = __AUTO_KEY__$' \"$CLUSTER_DIR/cluster.ini\"; then\n  KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \\n')\n  sed -i \"s/^cluster_key = __AUTO_KEY__$/cluster_key = $KEY/\" \"$CLUSTER_DIR/cluster.ini\"\nfi\n\n# DST expects a bin64 working directory for its data/ lookup.\ncd \"$BIN_DIR\"\nMASTER_PID=''\nCAVES_PID=''\nstop_shards() {\n  trap - INT TERM EXIT\n  [[ -z \"$CAVES_PID\" ]] || kill -TERM \"$CAVES_PID\" 2>/dev/null || true\n  [[ -z \"$MASTER_PID\" ]] || kill -TERM \"$MASTER_PID\" 2>/dev/null || true\n  [[ -z \"$CAVES_PID\" ]] || wait \"$CAVES_PID\" 2>/dev/null || true\n  [[ -z \"$MASTER_PID\" ]] || wait \"$MASTER_PID\" 2>/dev/null || true\n}\ntrap stop_shards INT TERM EXIT\n\n\"$BOX64\" \"$BIN\" -persistent_storage_root \"$ROOT\" -console -cluster DontStarveTogetherServer -shard Master &\nMASTER_PID=$!\nsleep 10\nif ! kill -0 \"$MASTER_PID\" 2>/dev/null; then echo \"Master exited before Caves startup\" >&2; exit 1; fi\n\n\"$BOX64\" \"$BIN\" -persistent_storage_root \"$ROOT\" -console -cluster DontStarveTogetherServer -shard Caves &\nCAVES_PID=$!\nset +e\nwait -n \"$MASTER_PID\" \"$CAVES_PID\"\nSTATUS=$?\nset -e\nexit \"$STATUS\"\n"
+    }
+  ],
+  "run": {
+    "command": "/bin/bash ./start_dst_master_caves.sh",
+    "stopCode": 2,
+    "stdin": {
+      "type": "stdin"
+    },
+    "autostart": false,
+    "autorecover": false,
+    "autorestart": false
+  },
+  "environment": {
+    "type": "host"
+  },
+  "supportedEnvironments": [
+    {
+      "type": "host"
+    }
+  ],
+  "requirements": {
+    "os": "linux",
+    "arch": "arm64",
+    "binaries": [
+      "box64",
+      "bash",
+      "od",
+      "sed"
+    ]
+  }
+}
