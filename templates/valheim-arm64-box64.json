@@ -1,0 +1,169 @@
+{
+  "type": "valheim-arm64-box64",
+  "display": "Valheim Dedicated Server (ARM64 via Box64)",
+  "data": {
+    "name": {
+      "type": "string",
+      "value": "Valheim Server",
+      "display": "Name",
+      "desc": "Choose your servername.",
+      "required": true,
+      "userEdit": true
+    },
+    "password": {
+      "type": "string",
+      "value": "",
+      "display": "Password",
+      "desc": "Enter a server password (at least five characters) in PufferPanel; do not store credentials in the template.",
+      "required": true,
+      "userEdit": true
+    },
+    "port": {
+      "type": "integer",
+      "value": 2456,
+      "display": "Game UDP port",
+      "desc": "What port to bind the server to.",
+      "required": true,
+      "userEdit": true
+    },
+    "world": {
+      "type": "string",
+      "value": "VHWorld",
+      "display": "World",
+      "desc": "What worldmap name to use.",
+      "required": true,
+      "userEdit": true
+    },
+    "public": {
+      "type": "option",
+      "value": "0",
+      "display": "Public listing",
+      "desc": "0: unlisted; 1: public server listing.",
+      "required": true,
+      "userEdit": true,
+      "options": [
+        {
+          "value": "0",
+          "display": "Unlisted"
+        },
+        {
+          "value": "1",
+          "display": "Public"
+        }
+      ]
+    },
+    "preset": {
+      "type": "option",
+      "value": "normal",
+      "display": "World preset",
+      "desc": "World difficulty preset; test changes on disposable worlds first.",
+      "required": true,
+      "userEdit": true,
+      "options": [
+        {
+          "value": "normal",
+          "display": "Normal"
+        },
+        {
+          "value": "easy",
+          "display": "Easy"
+        },
+        {
+          "value": "hard",
+          "display": "Hard"
+        },
+        {
+          "value": "hardcore",
+          "display": "Hardcore"
+        },
+        {
+          "value": "casual",
+          "display": "Casual"
+        },
+        {
+          "value": "immersive",
+          "display": "Immersive"
+        },
+        {
+          "value": "hammer",
+          "display": "Hammer"
+        }
+      ]
+    },
+    "resources": {
+      "type": "option",
+      "value": "default",
+      "display": "Resource modifier",
+      "desc": "Optional resource multiplier.",
+      "required": true,
+      "userEdit": true,
+      "options": [
+        {
+          "value": "default",
+          "display": "Default"
+        },
+        {
+          "value": "more",
+          "display": "More (1.5x)"
+        },
+        {
+          "value": "muchmore",
+          "display": "Much more (2x)"
+        },
+        {
+          "value": "most",
+          "display": "Most (3x)"
+        }
+      ]
+    }
+  },
+  "install": [
+    {
+      "type": "steamgamedl",
+      "appId": "896660"
+    },
+    {
+      "type": "command",
+      "commands": [
+        "chmod +x valheim_server.x86_64"
+      ]
+    }
+  ],
+  "run": {
+    "command": [
+      {
+        "if": "resources == 'default'",
+        "command": "box64 ./valheim_server.x86_64 -nographics -batchmode -name \"${name}\" -port ${port} -world \"${world}\" -password \"${password}\" -public ${public} -preset ${preset}"
+      },
+      {
+        "if": "resources != 'default'",
+        "command": "box64 ./valheim_server.x86_64 -nographics -batchmode -name \"${name}\" -port ${port} -world \"${world}\" -password \"${password}\" -public ${public} -preset ${preset} -modifier resources ${resources}"
+      }
+    ],
+    "stopCode": 2,
+    "stdin": {
+      "type": "stdin"
+    },
+    "environmentVars": {
+      "LD_LIBRARY_PATH": "./linux64:$LD_LIBRARY_PATH"
+    },
+    "autostart": false,
+    "autorecover": false,
+    "autorestart": false
+  },
+  "environment": {
+    "type": "host"
+  },
+  "supportedEnvironments": [
+    {
+      "type": "host"
+    }
+  ],
+  "requirements": {
+    "os": "linux",
+    "arch": "arm64",
+    "binaries": [
+      "box64"
+    ]
+  }
+}
