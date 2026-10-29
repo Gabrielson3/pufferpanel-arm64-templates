@@ -1,0 +1,15 @@
+# Never commit credentials, private host files, or game data.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_ed25519
+id_rsa
+*cluster_token.txt
+*server_token.txt
+*.log
+*.zip
+backups/
+saves/
+worlds/
