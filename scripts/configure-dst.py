@@ -16,8 +16,10 @@ CLUSTER = ROOT / "DoNotStarveTogether" / "DontStarveTogetherServer"
 INI = CLUSTER / "cluster.ini"
 
 
-def env(name):
+def env(name, optional=False):
     value = os.environ.get(name)
+    if value is None and optional:
+        return ""
     if value is None:
         raise ValueError(f"Missing PufferPanel environment variable: {name}")
     return value
@@ -135,8 +137,8 @@ def main():
     name = one_line(env("DST_SERVER_NAME"), "server name").strip()
     if not name:
         raise ValueError("Server name cannot be empty")
-    description = one_line(env("DST_DESCRIPTION"), "description")
-    password = one_line(env("DST_PASSWORD"), "server password")
+    description = one_line(env("DST_DESCRIPTION", optional=True), "description")
+    password = one_line(env("DST_PASSWORD", optional=True), "server password")
     max_players = number("DST_MAX_PLAYERS", 1, 64)
     reserved = number("DST_RESERVED_SLOTS", 0, max_players)
     game_mode = env("DST_GAME_MODE")
@@ -153,7 +155,7 @@ def main():
     list_mode = env("DST_WHITELIST_MODE")
     if list_mode not in ("file", "panel"):
         raise ValueError("Whitelist management must be 'file' or 'panel'")
-    listed_ids = parse_ids(env("DST_WHITELIST_IDS")) if list_mode == "panel" else []
+    listed_ids = parse_ids(env("DST_WHITELIST_IDS", optional=True)) if list_mode == "panel" else []
 
     changes = {
         "GAMEPLAY": {
