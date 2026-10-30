@@ -70,6 +70,12 @@ def main():
             upgraded_data[key] = definition  # Preserve custom instance variables.
     server["data"] = upgraded_data
     server["run"] = copy.deepcopy(template["run"])
+    # The updated startup helper requires Python 3 on the host.
+    requirements = server.get("requirements")
+    if isinstance(requirements, dict):
+        binaries = requirements.get("binaries")
+        if isinstance(binaries, list) and "python3" not in binaries:
+            binaries.append("python3")
     print("DST instance JSON located; settings and existing values will be preserved.")
     print("New variables:", ", ".join(k for k in template["data"] if k not in json.loads(target.read_text(encoding="utf-8"))["data"]))
     print("Updated run configuration: yes")
