@@ -14,4 +14,4 @@ Modifications:
 - Valheim: Box64 execution, ARM64 host requirements, editable world preset and resource modifiers.
 - Don't Starve Together: Box64 execution, Master/Caves shard configuration, a localhost-only synchronization endpoint, an underground world-generation preset, and an experimental two-process supervisor.
 
-These are independently maintained experimental modifications, not official PufferPanel templates.
+The JSON templates now reside in their game-specific folders (`minecraft/`, `valheim/` and `dontstarvetogether/`). They retain their original template type identifiers. These independently maintained community modifications are not official PufferPanel templates. See the root [README](../README.md#authorship-and-ai-assistance) for disclosure of substantial development assistance from ChatGPT (OpenAI).

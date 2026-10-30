@@ -12,6 +12,9 @@ if [[ ! -f "$BIN" ]]; then echo "DST x86_64 dedicated server binary was not foun
 if [[ ! -s "$CLUSTER_DIR/cluster_token.txt" ]]; then echo "Missing Klei cluster token" >&2; exit 2; fi
 if [[ ! -f "$CLUSTER_DIR/cluster.ini" ]]; then echo "Missing cluster.ini" >&2; exit 2; fi
 
+# Apply PufferPanel-managed settings without replacing world or custom shard data.
+python3 "$ROOT/configure_dst.py"
+
 if grep -q '^cluster_key = __AUTO_KEY__$' "$CLUSTER_DIR/cluster.ini"; then
   KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
   sed -i "s/^cluster_key = __AUTO_KEY__$/cluster_key = $KEY/" "$CLUSTER_DIR/cluster.ini"
@@ -30,12 +33,12 @@ stop_shards() {
 }
 trap stop_shards INT TERM EXIT
 
-"$BOX64" "$BIN" -persistent_storage_root "$ROOT" -console -cluster DontStarveTogetherServer -shard Master &
+"$BOX64" "$BIN" -persistent_storage_root "$ROOT" -cluster DontStarveTogetherServer -shard Master &
 MASTER_PID=$!
 sleep 10
 if ! kill -0 "$MASTER_PID" 2>/dev/null; then echo "Master exited before Caves startup" >&2; exit 1; fi
 
-"$BOX64" "$BIN" -persistent_storage_root "$ROOT" -console -cluster DontStarveTogetherServer -shard Caves &
+"$BOX64" "$BIN" -persistent_storage_root "$ROOT" -cluster DontStarveTogetherServer -shard Caves &
 CAVES_PID=$!
 set +e
 wait -n "$MASTER_PID" "$CAVES_PID"
