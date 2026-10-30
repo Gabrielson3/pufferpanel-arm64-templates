@@ -8,7 +8,7 @@ Experimental community-style [PufferPanel](https://www.pufferpanel.com/) 3 templ
 | Valheim | Linux x86_64 via Box64 | [Valheim](templates/valheim-arm64-box64.json) |
 | Don't Starve Together | Linux x86_64 via Box64; Master and Caves in one PufferPanel instance | [DST](templates/dst-arm64-box64-master-caves.json) |
 
-**Development status:** These templates are experimental and have not passed fresh-install and lifecycle tests on every supported host. Use only disposable test worlds until installation, connectivity, saves, and shutdown have been verified.
+**Development status:** Tested on one Ubuntu 22.04 ARM64 host with PufferPanel 3.0.9. Minecraft Java, Valheim (Steam networking), and DST Master + Caves have passed basic functional tests. Results are not a guarantee of compatibility on other hosts, with other game versions, or under prolonged load.
 
 ## Importing
 
@@ -18,7 +18,7 @@ The templates are designed for PufferPanel's **host** environment. The machine m
 
 ## Don't Starve Together
 
-The experimental DST template installs two shard configurations, then starts both Master and Caves as child processes of one PufferPanel server. Review [DST shard details](docs/DST-SHARDS.md) before testing. Independent shard controls and reliable graceful shutdown are **not yet provided**.
+The DST template installs two shard configurations, then starts both Master and Caves as child processes of one PufferPanel server. On a Box64 0.4.4 test host, both shards initialized, connected, transferred a player from Master to Caves, serialized their worlds on a controlled PufferPanel stop, and reloaded their saved worlds on a later start. This confirms the observed basic lifecycle, not robustness under all shutdown scenarios. Independent shard controls are **not provided**. See [DST shard details](docs/DST-SHARDS.md) for test scope, remaining limitations, and whitelist behavior.
 
 ## Security and license
 
