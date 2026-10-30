@@ -130,26 +130,30 @@
     }
   ],
   "run": {
-    "command": [
-      {
-        "if": "resources == 'default'",
-        "command": "box64 ./valheim_server.x86_64 -nographics -batchmode -name \"${name}\" -port ${port} -world \"${world}\" -password \"${password}\" -public ${public} -preset ${preset}"
-      },
-      {
-        "if": "resources != 'default'",
-        "command": "box64 ./valheim_server.x86_64 -nographics -batchmode -name \"${name}\" -port ${port} -world \"${world}\" -password \"${password}\" -public ${public} -preset ${preset} -modifier resources ${resources}"
-      }
-    ],
+    "command": "/bin/bash ./start_valheim.sh",
     "stopCode": 2,
     "stdin": {
       "type": "stdin"
     },
     "environmentVars": {
-      "LD_LIBRARY_PATH": "./linux64:$LD_LIBRARY_PATH"
+      "VH_NAME": "${name}",
+      "VH_WORLD": "${world}",
+      "VH_PASSWORD": "${password}",
+      "VH_PORT": "${port}",
+      "VH_PUBLIC": "${public}",
+      "VH_PRESET": "${preset}",
+      "VH_RESOURCES": "${resources}"
     },
     "autostart": false,
     "autorecover": false,
-    "autorestart": false
+    "autorestart": false,
+    "pre": [
+      {
+        "type": "writefile",
+        "target": "start_valheim.sh",
+        "text": "#!/usr/bin/env bash\n# Valheim launcher for PufferPanel on ARM64 with Box64.\n# PufferPanel provides values through environment variables so whitespace and\n# quotation marks are passed as arguments, not parsed as shell syntax.\nset -Eeuo pipefail\ncd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\"\n\nif [[ ! -f ./valheim_server.x86_64 ]]; then\n  echo 'Valheim server executable is missing; install the server first.' >&2\n  exit 127\nfi\nif ! command -v box64 >/dev/null 2>&1; then\n  echo 'Box64 is not available on PATH.' >&2\n  exit 127\nfi\n: \"${VH_NAME:?Missing server name}\"\n: \"${VH_WORLD:?Missing world name}\"\n: \"${VH_PASSWORD:?Missing server password}\"\n: \"${VH_PORT:?Missing UDP port}\"\n: \"${VH_PUBLIC:?Missing public-listing flag}\"\n: \"${VH_PRESET:?Missing world preset}\"\n: \"${VH_RESOURCES:?Missing resource modifier}\"\nif (( ${#VH_PASSWORD} < 5 )); then\n  echo 'Server password must contain at least five characters.' >&2\n  exit 2\nfi\n\nexport LD_LIBRARY_PATH=\"./linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}\"\n# Box64 can log all command arguments, including the password. Keep it quiet\n# by default; admins may override BOX64_LOG for private troubleshooting.\nexport BOX64_LOG=\"${BOX64_LOG:-0}\"\nargs=(\n  -nographics -batchmode\n  -name \"$VH_NAME\"\n  -port \"$VH_PORT\"\n  -world \"$VH_WORLD\"\n  -password \"$VH_PASSWORD\"\n  -public \"$VH_PUBLIC\"\n  -preset \"$VH_PRESET\"\n)\nif [[ \"$VH_RESOURCES\" != 'default' ]]; then\n  args+=(-modifier resources \"$VH_RESOURCES\")\nfi\nexec box64 ./valheim_server.x86_64 \"${args[@]}\"\n"
+      }
+    ]
   },
   "environment": {
     "type": "host"
