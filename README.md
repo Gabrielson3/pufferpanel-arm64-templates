@@ -18,7 +18,7 @@ The templates are designed for PufferPanel's **host** environment. The machine m
 
 ## Don't Starve Together
 
-The DST template installs two shard configurations, then starts both Master and Caves as child processes of one PufferPanel server. On a Box64 0.4.4 test host, both shards initialized, connected, transferred a player from Master to Caves, serialized their worlds on a controlled PufferPanel stop, and reloaded their saved worlds on a later start. This confirms the observed basic lifecycle, not robustness under all shutdown scenarios. Independent shard controls are **not provided**. See [DST shard details](docs/DST-SHARDS.md) for test scope, remaining limitations, and whitelist behavior.
+The DST template installs two shard configurations, then starts both Master and Caves as child processes of one PufferPanel server. On a Box64 0.4.4 test host, both shards initialized, connected, transferred a player from Master to Caves, serialized their worlds on a controlled PufferPanel stop, and reloaded their saved worlds on a later start. This confirms the observed basic lifecycle, not robustness under all shutdown scenarios. Independent shard controls are **not provided**. The template now exposes PvP, pause-when-empty, whitelist reserved seats, optional panel-managed Klei IDs, and Steam-group-only access in the server variables; it synchronizes only managed `cluster.ini` keys on startup. **Reserved seats are not a strict whitelist.** Existing instances require explicit [upgrade](scripts/upgrade-dst-instance.py) to get the new fields. See [DST shard details](docs/DST-SHARDS.md) for test scope, setup, and remaining limitations.
 
 ## Security and license
 
