@@ -31,6 +31,46 @@ This is an observed successful lifecycle test, **not** a guarantee of crash safe
 
 The DST `whitelist.txt` feature **reserves player slots**; it must not be treated as a strict admission-control list. In the test, `whitelist_slots = 6` with six total slots and no matching listed player IDs did **not** prevent a connection. The connection also used the token owner's administrative account, so it is not a conclusive test of how an ordinary unlisted player is treated. Use a server password and, when necessary, additional access restrictions; never assume an empty whitelist blocks everyone.
 
+## PufferPanel settings and access control
+
+This template now exposes the following values in PufferPanel's server variables:
+
+- Server name, description, password, player limit and Survival game mode.
+- **Reserved whitelist slots** (`whitelistslots`, default `0`): this is a **reserved-seat mechanism**, not a guaranteed allowlist. Reserving all available seats without enough listed users does not automatically block outsiders. Server owners or admins may also be unsuitable accounts for testing access restrictions.
+- **Whitelist ID management** (`whitelistmode`, default `file`):
+  - **File manager:** maintain `whitelist.txt` beside `cluster.ini`; startup leaves this file untouched.
+  - **PufferPanel:** enter a comma-separated list of Klei IDs beginning with `KU_` in the `whitelistids` field. Each startup replaces `whitelist.txt` with those IDs, removes duplicates, and verifies the format. An empty field deliberately clears the list in panel mode. Do not manually edit the list while panel mode is enabled, because the next start overwrites those edits.
+- PvP and pause-when-empty toggles.
+- **Steam group only:** when enabled, membership in the supplied decimal Steam group ID is required. An empty/zero ID is rejected when group-only access is enabled. This is a separate access mechanism from DST's reserved slots.
+- `adminlist.txt` and `blocklist.txt` live beside `cluster.ini` and are managed in the PufferPanel file manager. One Klei `KU_` ID per line.
+
+The new-install template creates empty `whitelist.txt`, `adminlist.txt`, and `blocklist.txt` only when missing. The cluster token is supplied privately in the server variables and must never be committed.
+
+### Applying changes without overwriting worlds
+
+At each start, the PufferPanel `run.pre` step writes the latest helper scripts, then `configure_dst.py` synchronizes **only these keys** in the existing `cluster.ini`:
+
+- `[GAMEPLAY]`: `game_mode`, `max_players`, `pvp`, `pause_when_empty`
+- `[NETWORK]`: `cluster_name`, `cluster_description`, `cluster_password`, `whitelist_slots`
+- `[STEAM]`: `steam_group_only`, `steam_group_id`
+
+Other INI keys, other files, the cluster synchronization key, and both shard worlds are not modified. The helper keeps a one-time `cluster.ini.before-panel-management` backup before its first actual change; `whitelist.txt.before-panel-management` is likewise saved once if panel mode first overwrites an existing list. Settings owned by PufferPanel take precedence over manual edits to those specific managed INI keys on the next startup.
+
+The obsolete `-console` flag has been removed from the launcher: `[MISC] console_enabled = true` remains active.
+
+### Existing instances
+
+Updating the GitHub template **does not** automatically change already-created server definitions. To migrate an existing instance without deleting worlds, download the updated template JSON and the [upgrade helper](../scripts/upgrade-dst-instance.py), stop the game and PufferPanel service, preview the upgrade, then apply it. The helper preserves existing variable values, imports newly-managed `whitelist_slots`, PvP, pause and Steam group values from the instance's current `cluster.ini`, and backs up the instance JSON before replacing its `data` and `run` sections. Its default whitelist mode is `file`, preserving existing lists. Review the new variables before restarting. The upgrade helper does not alter world saves, cluster token or cluster configuration directly.
+
+The upgrade helper syntax is:
+
+```sh
+python3 upgrade-dst-instance.py SERVER_ID latest-template.json
+sudo python3 upgrade-dst-instance.py SERVER_ID latest-template.json --apply
+```
+
+The game and PufferPanel service must already be stopped when running `--apply`. Do not put private instance files in a public repository.
+
 ## Known limitations
 
 - A compatible x86_64 game-download setup, Box64 and matching runtime libraries must already be available on the ARM64 host. The `steamgamedl` operation can require host-specific compatibility setup.
