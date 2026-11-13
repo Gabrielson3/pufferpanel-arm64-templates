@@ -8,6 +8,10 @@ Unofficial, community-maintained [PufferPanel](https://www.pufferpanel.com/) 3 t
 | Valheim | Linux x86_64 via Box64 | [JSON](valheim/valheim-arm64-box64.json) | [Valheim README](valheim/README.md) |
 | Don't Starve Together | Linux x86_64 via Box64, Master + Caves | [JSON](dontstarvetogether/dst-arm64-box64-master-caves.json) | [DST README](dontstarvetogether/README.md) |
 
+## Decision continuity
+
+See [project-specific decision and chat handoff conventions](docs/CONTINUITY.md) before making changes. Record lasting choices and evidence in the **relevant game's documentation**; Minecraft, Valheim and Don't Starve Together have separate runtimes, risks and validation histories.
+
 ## Compatibility and testing
 
 All three templates passed basic functional tests on an Ubuntu 22.04 ARM64 host with **PufferPanel 3.0.9**. Valheim and Don't Starve Together were tested with **Box64 0.4.4**.
