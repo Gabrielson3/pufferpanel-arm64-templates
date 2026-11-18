@@ -2,6 +2,10 @@
 
 **Normative. Read this before making changes.** This file overrides older, conflicting suggestions in historic issues, commit notes, READMEs or prior chats. The code and current GitHub state still determine what is actually implemented. Record exceptions only when the owner explicitly decides them.
 
+## Repository language
+
+Write repository documentation, READMEs, new issues and commit messages **in English**. Preserve exact source identifiers, API names, commands, upstream quotations and game-provided strings when translation would change their meaning. The separate Gamer Poker repository is the owner's **Portuguese-language exception**; do not copy its locale to this project.
+
 ## Git model — MAIN ONLY
 
 - **`main` is the only authorized development branch.** Work and commit directly on `main`; use small, reversible, appropriately scoped commits even when the owner wants a large functional development batch.
