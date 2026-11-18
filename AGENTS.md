@@ -1,5 +1,14 @@
 # Agent instructions — PufferPanel ARM64 templates
 
+> **First action in every new task:** read [docs/WORKFLOW.md](docs/WORKFLOW.md) and obey its owner-approved operating rules **before** planning, coding, versioning or packaging. **Work on `main` only: never create a new branch, PR, temporary release/review branch or GitHub Release without explicit case-specific approval.** For installable deliverables, create a verified local ChatGPT attachment rather than linking a ZIP stored in GitHub. Use substantial internal development batches instead of repeated owner checkups. These requirements override conflicting older workflow guidance.
+
+## Non-negotiable owner workflow
+
+- **Git:** `main` only; individual commits for rollback. Do not create development, review, temporary or release branches.
+- **Distribution:** GitHub stores source/issues/docs; installable files are generated and linked **as actual ChatGPT attachments**, not GitHub Releases or ZIPs committed to `dist/`.
+- **Verification:** never claim a build was run or accepted if only static checks/archive integrity were verified. If no local source file transfer is possible, disclose the blocker rather than substituting GitHub delivery.
+- **Handoff:** re-read `docs/WORKFLOW.md`, `docs/CONTINUITY.md`, project docs and actual `main` state even when coming from a long conversation summary. Honor the project's security, data and deployment constraints.
+
 When operating inside this repository, **first read** [README.md](README.md), [docs/CONTINUITY.md](docs/CONTINUITY.md), and [docs/UPSTREAM.md](docs/UPSTREAM.md). Then inspect the appropriate **game-specific README and JSON template**.
 
 - Treat **Minecraft Java ARM64**, **Valheim Box64**, and **Don't Starve Together Box64 Master/Caves** as **separate templates with separate assumptions**, not interchangeable server configurations.
