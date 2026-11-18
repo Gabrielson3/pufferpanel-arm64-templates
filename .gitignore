@@ -13,3 +13,13 @@ id_rsa
 backups/
 saves/
 worlds/
+
+# Delivery archives and sensitive host/runtime state
+*.tar.gz
+*.7z
+*.rar
+*.sqlite
+*.sqlite3
+**/backups/
+**/saves/
+**/worlds/
