@@ -1,5 +1,8 @@
 # PufferPanel ARM64 game server templates
 
+> **Workflow obrigatório:** leia [docs/WORKFLOW.md](docs/WORKFLOW.md) e [docs/STATUS.md](docs/STATUS.md) antes de desenvolver. **Somente `main`**; não criar branches, PRs ou GitHub Releases por iniciativa própria. O código e as decisões ficam no GitHub; os arquivos instaláveis devem ser gerados localmente e enviados como **anexo direto na conversa do ChatGPT**, não como ZIP/Release hospedado no GitHub. Respeite as ressalvas de implantação específicas deste projeto.
+
+
 Unofficial, community-maintained [PufferPanel](https://www.pufferpanel.com/) 3 templates for Linux ARM64/AArch64 hosts.
 
 | Game | Runtime | Template | Documentation |
