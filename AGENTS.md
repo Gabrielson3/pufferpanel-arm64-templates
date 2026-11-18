@@ -1,6 +1,6 @@
 # Agent instructions — PufferPanel ARM64 templates
 
-> **First action in every new task:** read [docs/WORKFLOW.md](docs/WORKFLOW.md) and obey its owner-approved operating rules **before** planning, coding, versioning or packaging. **Work on `main` only: never create a new branch, PR, temporary release/review branch or GitHub Release without explicit case-specific approval.** For installable deliverables, create a verified local ChatGPT attachment rather than linking a ZIP stored in GitHub. Use substantial internal development batches instead of repeated owner checkups. These requirements override conflicting older workflow guidance.
+> **First action in every new task:** read [docs/WORKFLOW.md](docs/WORKFLOW.md), [docs/STATUS.md](docs/STATUS.md) and obey its owner-approved operating rules **before** planning, coding, versioning or packaging. **Work on `main` only: never create a new branch, PR, temporary release/review branch or GitHub Release without explicit case-specific approval.** For installable deliverables, create a verified local ChatGPT attachment rather than linking a ZIP stored in GitHub. Use substantial internal development batches instead of repeated owner checkups. These requirements override conflicting older workflow guidance.
 
 ## Non-negotiable owner workflow
 
