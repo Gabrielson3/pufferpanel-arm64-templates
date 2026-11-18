@@ -1,51 +1,44 @@
 # PufferPanel ARM64 game server templates
 
-> **Workflow obrigatório:** leia [docs/WORKFLOW.md](docs/WORKFLOW.md) e [docs/STATUS.md](docs/STATUS.md) antes de desenvolver. **Somente `main`**; não criar branches, PRs ou GitHub Releases por iniciativa própria. O código e as decisões ficam no GitHub; os arquivos instaláveis devem ser gerados localmente e enviados como **anexo direto na conversa do ChatGPT**, não como ZIP/Release hospedado no GitHub. Respeite as ressalvas de implantação específicas deste projeto.
+Unofficial community-maintained [PufferPanel](https://www.pufferpanel.com/) 3 templates for Linux ARM64/AArch64 hosts. They configure the host environment directly rather than Docker.
 
+## Templates
 
-Unofficial, community-maintained [PufferPanel](https://www.pufferpanel.com/) 3 templates for Linux ARM64/AArch64 hosts.
-
-| Game | Runtime | Template | Documentation |
+| Game | Runtime | Template | Guide |
 | --- | --- | --- | --- |
-| Minecraft Java | Native ARM64 Java | [JSON](minecraft/minecraft-java-arm64.json) | [Minecraft README](minecraft/README.md) |
-| Valheim | Linux x86_64 via Box64 | [JSON](valheim/valheim-arm64-box64.json) | [Valheim README](valheim/README.md) |
-| Don't Starve Together | Linux x86_64 via Box64, Master + Caves | [JSON](dontstarvetogether/dst-arm64-box64-master-caves.json) | [DST README](dontstarvetogether/README.md) |
+| Minecraft Java | Native ARM64 Java | [JSON](minecraft/minecraft-java-arm64.json) | [Minecraft](minecraft/README.md) |
+| Valheim | Linux x86_64 server via Box64 | [JSON](valheim/valheim-arm64-box64.json) | [Valheim](valheim/README.md) |
+| Don't Starve Together | Linux x86_64 via Box64; Master + Caves | [JSON](dontstarvetogether/dst-arm64-box64-master-caves.json) | [DST](dontstarvetogether/README.md) |
 
-## Decision continuity
+Each game has independent installation requirements, variable definitions and compatibility limits; read its guide before importing a template.
 
-See [project-specific decision and chat handoff conventions](docs/CONTINUITY.md) before making changes. Record lasting choices and evidence in the **relevant game's documentation**; Minecraft, Valheim and Don't Starve Together have separate runtimes, risks and validation histories.
+## Compatibility and validation
 
-## Compatibility and testing
+Basic functional tests were completed on **Ubuntu 22.04 ARM64** with **PufferPanel 3.0.9**. Valheim and DST used **Box64 0.4.4**.
 
-All three templates passed basic functional tests on an Ubuntu 22.04 ARM64 host with **PufferPanel 3.0.9**. Valheim and Don't Starve Together were tested with **Box64 0.4.4**.
+- **Minecraft:** native ARM64 server operation tested.
+- **Valheim:** Steam-network multiplayer and world save/reload tested; PlayFab/crossplay was not validated.
+- **DST:** Master/Caves startup, shard connections, player transitions, controlled saving/shutdown and world reload tested. An expanded settings template also passed a fresh-install multiplayer lifecycle test.
 
-- **Minecraft Java:** native ARM64 server operation was tested.
-- **Valheim:** Steam-network multiplayer, world saving and reloading were tested; PlayFab/crossplay was not validated.
-- **Don't Starve Together:** Master/Caves startup, communication, player transfer, controlled save/shutdown and subsequent world reload were tested. Its expanded server-settings template also passed a fresh-install, multiplayer connection, cave transition and controlled shutdown test.
-
-These are limited real-world tests, not a guarantee of prolonged stability, support on other hosts, crash safety or compatibility with future updates. Read each game's README and back up worlds before making changes.
+These observations are not guarantees of crash recovery, unattended operation or compatibility with future game versions. Back up important worlds before changing a running server.
 
 ## Installation
 
-1. Prepare a Linux ARM64 machine with PufferPanel 3. The templates target the **host environment**, not Docker.
-2. Read the relevant game's README for Box64, Java, Steam download, network and game-specific requirements.
-3. Add `https://github.com/Gabrielson3/pufferpanel-arm64-templates.git` as a PufferPanel template repository on branch `main`, or download and import the desired JSON file.
-4. Create a server from the template, set game variables and credentials privately, install, launch and test saves and connectivity.
+1. Prepare a Linux ARM64 host with PufferPanel 3 and the dependencies listed in the game-specific guide.
+2. Add `https://github.com/Gabrielson3/pufferpanel-arm64-templates.git` as a PufferPanel template repository using branch **`main`**, or import the desired JSON file.
+3. Set all game-specific variables and credentials **in your private server instance**, then install and verify connectivity and save behavior.
 
-**Important:** On ARM64, PufferPanel's `steamgamedl` operation may need additional host-side compatibility setup to download Linux x86_64 Steam dedicated-server files.
+On ARM64, the PufferPanel `steamgamedl` operation may require additional host-side compatibility setup for Linux x86_64 Steam server downloads. Editing a JSON file in GitHub does **not** restart or update an existing game server.
 
-The files are grouped by game, following the [official PufferPanel template repository's](https://github.com/PufferPanel/templates/tree/v3) directory convention. PufferPanel 3 reads JSON templates from immediate subfolders and displays the `README.md` in each template folder. The former `templates/` JSON paths were relocated; **template identifiers and JSON contents were not changed by this reorganization**. Existing instances are unaffected by these file-location changes.
+The JSON templates follow the official PufferPanel v3 layout: immediate game subdirectories, with a local README for each template. Previous `templates/` paths were relocated without changing template identifiers or JSON content.
 
-## Authorship and AI assistance
+## Documentation and maintenance
 
-This repository was developed with **substantial assistance from [ChatGPT](https://chatgpt.com/) (OpenAI)**. ChatGPT produced and revised much of the template code, shell/Python helper scripts and documentation, and helped analyze server logs and troubleshoot compatibility issues.
+- [Owner-approved workflow](docs/WORKFLOW.md): `main`-only development; no automatic branches or GitHub Releases.
+- [Current status](docs/STATUS.md), [decision history](docs/CONTINUITY.md), [upstream provenance](docs/UPSTREAM.md) and [agent instructions](AGENTS.md).
 
-The repository owner defined the project's goals, supplied and configured the ARM64 test environment, performed the in-game validation, identified issues and directed revisions. The owner maintains the repository and is responsible for its contents. AI-assisted code can contain mistakes and should be independently reviewed, particularly before use with valuable worlds.
+## License, authorship and security
 
-**This project is not an OpenAI product and is not affiliated with, endorsed by, or maintained by OpenAI or PufferPanel.**
+Licensed under [Apache-2.0](LICENSE), with portions adapted from community templates; see [LICENSE-NOTICE](LICENSE-NOTICE.md) and [upstream attribution](docs/UPSTREAM.md). The project was substantially developed with ChatGPT (OpenAI) assistance under the owner's direction and real-world testing. It is not an OpenAI or PufferPanel product.
 
-## License, upstream attribution and security
-
-Distributed under [Apache-2.0](LICENSE). Portions of the JSON templates are adapted from the [PufferPanel community templates](https://github.com/PufferPanel/templates/tree/v3). See [upstream attribution](docs/UPSTREAM.md) and [license notice](LICENSE-NOTICE.md).
-
-Never commit server tokens, passwords, private keys, user identities, raw server logs, private host configurations or game saves. Supply secrets in your private PufferPanel instance.
+Do not commit access tokens, private keys, credentials, personal host configurations, raw private logs or saved worlds. AI-assisted code should be reviewed before use with valuable server data.
