@@ -1,5 +1,7 @@
 # Project continuity and decision record
 
+> **Current workflow supersession (2026-11-18):** [WORKFLOW.md](WORKFLOW.md) is the owner-approved **normative operating policy** and [STATUS.md](STATUS.md) is the short current handoff. **Only `main`** is authorized for development; creating feature/review/release/temporary branches is forbidden without explicit, case-specific approval. Do not generate GitHub Releases or place installable ZIPs in the repository to satisfy a ChatGPT deliverable. Attach validated local ChatGPT artifacts; distinguish source, archive verification, runtime acceptance and deployment. Any historical branch/release advice below is retained for context **but superseded**. Preserve project-specific data/runtime safety exceptions.
+
 **Purpose:** leave a small, durable explanation of important decisions for future ChatGPT sessions and maintainers. Read [README](../README.md), the **specific game template README**, the relevant JSON and [upstream attribution](UPSTREAM.md) before changing anything.
 
 ## Separate templates
