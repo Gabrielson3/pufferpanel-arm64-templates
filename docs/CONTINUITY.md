@@ -1,5 +1,7 @@
 # Project continuity and decision record
 
+> **2026-11-18 — packaging and acceptance rule clarification:** Creating an authenticated, source-complete, integrity-verified **development review** artifact is allowed before unavailable runtime/simulator/owner tests run, provided it is labeled **UNVALIDATED** and its skipped checks are listed. A known compilation/test failure is not a normal installable review build. Stable promotion and production deployment remain independent approvals. Direct ChatGPT file delivery, `main`-only commits, no new Releases/branches and no unapproved Actions use are unchanged. Where local source transfer is impossible, report that separate technical limitation rather than attributing it to packaging policy. The full normative wording is in [WORKFLOW.md](WORKFLOW.md).
+
 > **Current policy (2026-11-18):** [WORKFLOW.md](WORKFLOW.md) is authoritative; [STATUS.md](STATUS.md) records the latest verified state. Older instructions about development branches, releases or delivery methods are historical and **superseded**.
 
 **Purpose:** leave a small, durable explanation of important decisions for future ChatGPT sessions and maintainers. Read [README](../README.md), the **specific game template README**, the relevant JSON and [upstream attribution](UPSTREAM.md) before changing anything.
