@@ -1,0 +1,127 @@
+{
+  "type": "hytale-arm64",
+  "display": "Hytale Dedicated Server (ARM64 / Java 25)",
+  "data": {
+    "name": {
+      "type": "string",
+      "value": "Hytale Server",
+      "display": "Server name",
+      "desc": "Displayed to players.",
+      "required": true,
+      "userEdit": true
+    },
+    "motd": {
+      "type": "string",
+      "value": "Welcome to Hytale",
+      "display": "MOTD",
+      "desc": "Server description.",
+      "required": true,
+      "userEdit": true
+    },
+    "password": {
+      "type": "string",
+      "value": "",
+      "display": "Password",
+      "desc": "Optional server password.",
+      "required": false,
+      "userEdit": true
+    },
+    "maxplayers": {
+      "type": "integer",
+      "value": 6,
+      "display": "Maximum players",
+      "desc": "Concurrent players.",
+      "required": true,
+      "userEdit": true
+    },
+    "radius": {
+      "type": "integer",
+      "value": 12,
+      "display": "View radius (chunks)",
+      "desc": "Reduce for lower RAM usage.",
+      "required": true,
+      "userEdit": true
+    },
+    "memory": {
+      "type": "integer",
+      "value": 4096,
+      "display": "Java memory (MB)",
+      "desc": "Maximum Java heap; leave RAM for the OS.",
+      "required": true,
+      "userEdit": true
+    },
+    "port": {
+      "type": "integer",
+      "value": 5520,
+      "display": "UDP port",
+      "desc": "Allow this UDP port in host and cloud firewalls.",
+      "required": true,
+      "userEdit": true
+    }
+  },
+  "install": [
+    {
+      "type": "javadl",
+      "version": "25"
+    },
+    {
+      "type": "download",
+      "files": [
+        "https://downloader.hytale.com/hytale-downloader.zip"
+      ]
+    },
+    {
+      "type": "extract",
+      "source": "hytale-downloader.zip",
+      "destination": "downloader"
+    },
+    {
+      "type": "writefile",
+      "target": "install_hytale.sh",
+      "text": "#!/usr/bin/env bash\nset -Eeuo pipefail\ncd \"$(dirname \"$0\")\"\nif [[ -s Server/HytaleServer.jar && -s Assets.zip && -s start.sh ]]; then\n  echo \"[Hytale] Existing game installation preserved.\"\n  exit 0\nfi\nif [[ -e Server || -e Assets.zip || -e start.sh ]]; then\n  echo \"[Hytale] Partial game files found. Inspect the installation before retrying.\" >&2\n  exit 1\nfi\ncommand -v box64 >/dev/null || { echo \"[Hytale] Box64 is required for the downloader.\" >&2; exit 127; }\ncommand -v python3 >/dev/null || { echo \"[Hytale] Python 3 is required.\" >&2; exit 127; }\n[[ -f downloader/hytale-downloader-linux-amd64 ]] || { echo \"[Hytale] Official downloader not extracted.\" >&2; exit 1; }\necho \"[Hytale] Use the device-code URL shown below to authorize the official download.\"\n(cd downloader && box64 ./hytale-downloader-linux-amd64 -download-path game.zip)\n[[ -s downloader/game.zip ]] || { echo \"[Hytale] Official downloader did not produce game.zip.\" >&2; exit 1; }\npython3 - <<'PY'\nfrom pathlib import Path, PurePosixPath\nfrom zipfile import ZipFile\nimport shutil\nroot=Path.cwd()\nstaging=root/\".hytale-stage\"\nif staging.exists(): raise SystemExit(\"Old staging directory found; inspect it before retrying\")\nstaging.mkdir()\ntry:\n    with ZipFile(root/\"downloader/game.zip\") as z:\n        for f in z.infolist():\n            name=PurePosixPath(f.filename.replace(\"\\\\\",\"/\"))\n            if name.is_absolute() or \"..\" in name.parts:\n                raise ValueError(\"Unsafe path in download archive\")\n        z.extractall(staging)\n    for p in (\"Server/HytaleServer.jar\",\"Assets.zip\",\"start.sh\"):\n        if not (staging/p).is_file(): raise ValueError(\"Unexpected game archive structure: \"+p)\n    for p in (\"Server\",\"Assets.zip\",\"start.sh\",\"start.bat\"):\n        if (staging/p).exists():\n            if (root/p).exists(): raise ValueError(\"Destination already exists: \"+p)\n            shutil.move(str(staging/p),str(root/p))\n    (root/\"start.sh\").chmod(0o755)\nfinally:\n    shutil.rmtree(staging,ignore_errors=True)\n(root/\"downloader/game.zip\").unlink()\nprint(\"[Hytale] Server files installed.\")\nPY"
+    },
+    {
+      "type": "command",
+      "commands": [
+        "/bin/bash ./install_hytale.sh"
+      ]
+    }
+  ],
+  "run": {
+    "command": "/bin/bash ./launch_hytale.sh",
+    "stop": "/stop",
+    "environmentVars": {
+      "HYTALE_NAME": "${name}",
+      "HYTALE_MOTD": "${motd}",
+      "HYTALE_PASSWORD": "${password}",
+      "HYTALE_PLAYERS": "${maxplayers}",
+      "HYTALE_RADIUS": "${radius}",
+      "HYTALE_MEMORY": "${memory}",
+      "HYTALE_PORT": "${port}"
+    },
+    "pre": [
+      {
+        "type": "writefile",
+        "target": "launch_hytale.sh",
+        "text": "#!/usr/bin/env bash\nset -Eeuo pipefail\nROOT=$(cd \"$(dirname \"$0\")\" && pwd -P)\ncd \"$ROOT\"\n[[ -s Server/HytaleServer.jar && -s Assets.zip && -s start.sh ]] || {\n  echo \"[Hytale] Install the game server before starting.\" >&2; exit 1; }\npython3 - <<'PY'\nimport json,os,re,stat,tempfile\nfrom pathlib import Path\npath=Path(\"Server/config.json\")\ndef number(k,a,b):\n    text=os.getenv(k,\"\")\n    if not re.fullmatch(\"[0-9]+\",text) or not a<=int(text)<=b:\n        raise SystemExit(f\"Invalid {k} (expected {a}–{b})\")\n    return int(text)\nname=os.getenv(\"HYTALE_NAME\",\"\").strip()\nif not name: raise SystemExit(\"Server name cannot be empty\")\nplayers=number(\"HYTALE_PLAYERS\",1,100)\nradius=number(\"HYTALE_RADIUS\",2,32)\nmemory=number(\"HYTALE_MEMORY\",4096,32768)\nnumber(\"HYTALE_PORT\",1,65535)\ndata=json.loads(path.read_text(encoding=\"utf-8\")) if path.exists() else {}\nif not isinstance(data,dict): raise SystemExit(\"Server/config.json must be a JSON object\")\ndata.update({\"ServerName\":name,\"MOTD\":os.getenv(\"HYTALE_MOTD\",\"\"),\n             \"Password\":os.getenv(\"HYTALE_PASSWORD\",\"\"),\"MaxPlayers\":players,\n             \"MaxViewRadius\":radius})\nresult=json.dumps(data,indent=2,ensure_ascii=False)+\"\\n\"\nif not path.exists() or path.read_text(encoding=\"utf-8\")!=result:\n    fd,tmp=tempfile.mkstemp(prefix=\".hytale-config-\",dir=path.parent)\n    try:\n        with os.fdopen(fd,\"w\",encoding=\"utf-8\") as f: f.write(result)\n        os.chmod(tmp,stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o600)\n        os.replace(tmp,path)\n    finally:\n        Path(tmp).unlink(missing_ok=True)\nPath(\"jvm.options\").write_text(f\"-Xmx{memory}M\\n\",encoding=\"utf-8\")\nPY\nif command -v java25 >/dev/null 2>&1; then\n  JAVA_BIN=$(command -v java25)\nelif command -v java >/dev/null 2>&1 && java -version 2>&1 | grep -Eq '\"25(\\.|\")'; then\n  JAVA_BIN=$(command -v java)\nelse\n  echo \"[Hytale] Java 25 is unavailable.\" >&2\n  exit 127\nfi\nmkdir -p .hytale-java\nln -sfn \"$JAVA_BIN\" .hytale-java/java\nexport PATH=\"$ROOT/.hytale-java:$PATH\"\nexec /bin/bash ./start.sh --bind \"0.0.0.0:$HYTALE_PORT\""
+      }
+    ]
+  },
+  "environment": {
+    "type": "host"
+  },
+  "supportedEnvironments": [
+    {
+      "type": "host"
+    }
+  ],
+  "requirements": {
+    "os": "linux",
+    "arch": "arm64",
+    "binaries": [
+      "box64",
+      "bash",
+      "python3"
+    ]
+  }
+}

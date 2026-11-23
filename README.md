@@ -9,12 +9,13 @@ Unofficial community-maintained [PufferPanel](https://www.pufferpanel.com/) 3 te
 | Minecraft Java | Native ARM64 Java | [JSON](minecraft/minecraft-java-arm64.json) | [Minecraft](minecraft/README.md) |
 | Valheim | Linux x86_64 server via Box64 | [JSON](valheim/valheim-arm64-box64.json) | [Valheim](valheim/README.md) |
 | Don't Starve Together | Linux x86_64 via Box64; Master + Caves | [JSON](dontstarvetogether/dst-arm64-box64-master-caves.json) | [DST](dontstarvetogether/README.md) |
+| Hytale | ARM64 Java 25; Box64 downloader | [JSON](hytale/hytale-arm64.json) | [Hytale](hytale/README.md) |
 
 Each game has independent installation requirements, variable definitions and compatibility limits; read its guide before importing a template.
 
 ## Compatibility and validation
 
-Basic functional tests were completed on **Ubuntu 22.04 ARM64** with **PufferPanel 3.0.9**. Valheim and DST used **Box64 0.4.4**.
+Basic functional tests for Minecraft, Valheim and DST were completed on **Ubuntu 22.04 ARM64** with **PufferPanel 3.0.9**. Valheim and DST used **Box64 0.4.4**.
 
 - **Minecraft:** native ARM64 server operation tested.
 - **Valheim:** Steam-network multiplayer and world save/reload tested; PlayFab/crossplay was not validated.
