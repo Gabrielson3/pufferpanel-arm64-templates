@@ -16,6 +16,8 @@ The installer runs the [official Hytale Downloader](https://support.hytale.com/h
 
 Start the server, then enter `/auth login device` in the PufferPanel console and complete the separate **server** authorization. The official `start.sh` is retained to handle Hytale's staged updates and regular backups. Panel-managed fields are applied to `Server/config.json` on startup; other settings, worlds and account data are preserved.
 
+The launcher creates a private `.java-tmp` directory inside each server instance and sets `TMPDIR` and `JAVA_TOOL_OPTIONS` (`-Djava.io.tmpdir`) to use it. This allows the built-in updater to stage large downloads on disk rather than PufferPanel's small isolated `/tmp`. Keep sufficient free space on the server filesystem for updates. Existing instances can use the same settings in their Run Configuration without reinstalling.
+
 The JSON includes the install and launch helpers, so additional script downloads are not necessary.
 
 ## Compatibility
